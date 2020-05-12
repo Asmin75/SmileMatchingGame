@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Extra Smile Finding Game</title>
+	<style type="text/css">
+		#score{
+			 position: absolute;
+			 right: 100px;
+			 top: 47px;
+		}
+		#best{
+			position: absolute;
+			right: 100px;
+			top: 10px;
+		}
+		img {
+			position: absolute;
+		}
+		div {
+			position: absolute;
+			width: 500px;
+			height: 500px;
+		}
+		#rightSide {
+			left: 500px;
+			border-left: 1px solid black;
+		}
+	</style>
+</head>
+<body>
+	<h1>Extra Smile Finding Game</h1>
+	<p>Click on the extra smiling face on the left.</p>
+	<h2 id="score"></h2>
+	<h2 id="best"></h2>
+	<div id="leftSide">
+	</div>
+	<div id="rightSide">
+	</div>
+	<script type="text/javascript">
+		var score = 0;
+		var thehighScore = localStorage.getItem("thehighScore");
+		var numberOfFaces = 5;
+		var theLeftSide = document.getElementById('leftSide');
+		var theRightSide = document.getElementById('rightSide');
+		var theBody = document.getElementsByTagName('body')[0];
+
+		var start_music = new Audio();
+		var wrong_music = new Audio();
+		var correct_music = new Audio();
+
+		start_music.autoplay = true;
+		start_music.loop = true;
+		// wrong_music.autoplay = true;
+
+		start_music.src = "audio/Wii Music - Gaming Background Music (HD).mp3";
+		wrong_music.src = "audio/incorrect sound effect.mp3";
+		correct_music.src = "audio/Correct Answer Sound Effect2.mp3"
+
+		wrong_music.playbackRate = 2.0;
+		correct_music.playbackRate = 3.0;
+
+
+		function highScore(){
+			if(thehighScore !== null){
+			    if (score > thehighScore) {
+			        localStorage.setItem("thehighScore", score);      
+			    }
+			}
+			else{
+			    localStorage.setItem("thehighScore", score);
+			}
+			document.getElementById("best").innerHTML="High Score:" + thehighScore;
+		}
+
+		function startGame() {
+			start_music.play();
+			var start=confirm("Start Game?")
+			if (start==true){
+				start_music.volume = 0.1;
+				score = 0;
+				generateFaces();
+				highScore();
+			}
+			else{
+				start_music.pause();
+				theBody.onclick = null;
+			}
+			
+		}
+
+		function generateFaces() {
+
+			document.getElementById("score").innerHTML="Your Score:" + score;
+
+			while (theLeftSide.firstChild){
+				theLeftSide.removeChild(theLeftSide.firstChild)
+			}
+			while (theRightSide.firstChild){
+				theRightSide.removeChild(
+					theRightSide.firstChild)
+			}
+			for (var i = 0; i < numberOfFaces; ++i) {
+				elem_img = document.createElement('img');
+				elem_img.src = "smile.png"
+				elem_img.style.top = Math.floor(Math.random() * 400) + "px";
+				elem_img.style.left = Math.floor(Math.random() * 400) + "px";
+				theLeftSide.appendChild(elem_img);
+				}
+
+			leftSideImages = theLeftSide.cloneNode(true);
+			leftSideImages.removeChild(
+				leftSideImages.lastChild);
+			theRightSide.appendChild(leftSideImages);
+
+			theLeftSide.lastChild.onclick = function nextLevel(event){
+				correct_music.play();
+				event.stopPropagation();
+				numberOfFaces += 5;
+				score += 1;
+				generateFaces();
+				
+				console.log(highScore());
+				
+			}
+		}
+		
+		function reStartGame(){
+			var restart = confirm("Restart Game?");
+			if (restart==true){
+				window.location.reload();
+			}
+			else {
+				theBody.onclick = null;
+				theLeftSide.lastChild.onclick = null;
+			}
+		}
+
+		theBody.onclick = function gameOver(){
+				wrong_music.play();
+				alert("Game Over!");
+				if (alert){
+					reStartGame();
+					highScore();
+				}
+			}
+
+		startGame();
+		
+		</script>
+	</body>
+</html>
